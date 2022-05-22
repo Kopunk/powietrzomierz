@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Powietrzomierz',
       theme: ThemeData(
-        colorScheme: greenColorScheme,
+        colorScheme: redDarkColorScheme,
       ),
       home: const MyHomePage(title: 'Powietrzomierz'),
     );
