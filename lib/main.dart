@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:powietrzomierz/theme/colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'api_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,6 +44,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late Stations stations;
+
+  @override
+  void initState() {
+    super.initState();
+
+    Stations.fetchAllStations()
+        .then((value) => stations = Stations(stations: value.stations))
+        .whenComplete(() => {
+              // print('$stations'),
+              stations.searchStations("Gdańsk, ul. Leczkowa").then((value) => print(value.toString()))
+            });
+  }
+
   final Color barBackgroundColor = const Color(0xaac9c8c8);
   final Duration animDuration = const Duration(milliseconds: 250);
 
@@ -51,12 +68,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by

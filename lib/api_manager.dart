@@ -1,25 +1,37 @@
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-
-Future<Stations> fetchAllStations() async {
-  final response = await http
-      .get(Uri.parse('https://api.gios.gov.pl/pjp-api/rest/station/findAll'));
-
-  if (response.statusCode == 200) {
-    return Stations.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed GET API');
-  }
-}
+import 'package:full_text_search/full_text_search.dart';
 
 class Stations {
   List<Station> stations;
 
   Stations({required this.stations});
 
-  static Stations fromJson(List<Map<String, dynamic>> json) {
+  static Future<Stations> fetchAllStations() async {
+    return await http
+        .get(Uri.parse('https://api.gios.gov.pl/pjp-api/rest/station/findAll'))
+        .then((value) => fromJson(jsonDecode(value.body)));
+  }
+
+  static Stations fromJson(List<dynamic> json) {
     return Stations(stations: json.map((i) => Station.fromJson(i)).toList());
+  }
+
+  Future<List<String>> searchStations(String stationName) async {
+    return await FullTextSearch(
+            term: stationName, items: stations, tokenize: tokenize)
+        .findResults()
+        .then((value) => value.map((e) => e.name).toList());
+  }
+
+  static List<dynamic> tokenize(Station s) {
+    return s.name.split(' ');
+  }
+
+  @override
+  String toString() {
+    return stations.toString();
   }
 }
 
@@ -42,35 +54,10 @@ class Station {
         gegrLat: double.parse(json['gegrLat']),
         gegrLon: double.parse(json['gegrLon']));
   }
-}
 
-class GiosStation {
-  late int stationId;
-
-  GiosStation(String? stationName, String? geoLatitude, String? geoLongitude) {
-    int stationId = 0;
-    if (stationName != null) {
-      stationId = findStationByName(stationName);
-    } else if (geoLatitude != null && geoLongitude != null) {
-      stationId = findStationByGeo(geoLatitude, geoLongitude);
-    } else {
-      throw Exception(
-          "Either station name or geoLatitude and geoLongitude have to be provided");
-    }
-
-    if (stationId == -1) {
-      throw Exception("Station Not Found");
-    }
-
-    this.stationId = stationId;
-  }
-
-  int findStationByName(String stationName) {
-    return 0; //TODO: implement
-  }
-
-  int findStationByGeo(String geoLatitude, String geoLongitude) {
-    return 0; //TODO: implement
+  @override
+  String toString() {
+    return name;
   }
 }
 
@@ -98,11 +85,5 @@ class SensorData {
     this.pollutionO3,
   });
 
-  factory SensorData.fetch() {
-    http.get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
-    return SensorData(
-      indexLevelId: 0,
-      indexLevelName: '0',
-    );
-  }
+  // #TODO: add fetch and pull data
 }
