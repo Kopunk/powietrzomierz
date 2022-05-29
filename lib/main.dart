@@ -54,7 +54,9 @@ class _MyHomePageState extends State<MyHomePage> {
         .then((value) => stations = Stations(stations: value.stations))
         .whenComplete(() => {
               // print('$stations'),
-              stations.searchStations("Gdańsk, ul. Leczkowa").then((value) => print(value.toString()))
+              stations
+                  .searchStations("Gdańsk, ul. Leczkowa")
+                  .then((value) => print(value.toString()))
             });
   }
 
@@ -65,7 +67,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   bool isPlaying = false;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,9 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
 
         actions: [
-          IconButton(onPressed: () {
-            showdialog();
-          },
+          IconButton(
+              onPressed: () {
+                showdialog();
+              },
               icon: Icon(Icons.help_outline))
         ],
       ),
@@ -128,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           child: Padding(
                             padding:
-                            const EdgeInsets.symmetric(horizontal: 8.0),
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: BarChart(
                               isPlaying ? randomData() : mainBarData(),
                               swapAnimationDuration: animDuration,
@@ -153,41 +155,31 @@ class _MyHomePageState extends State<MyHomePage> {
     showGeneralDialog(
         context: context,
         barrierDismissible: true,
-        barrierLabel: MaterialLocalizations
-            .of(context)
-            .modalBarrierDismissLabel,
+        barrierLabel:
+            MaterialLocalizations.of(context).modalBarrierDismissLabel,
         barrierColor: Colors.black,
         transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (BuildContext buildContext,
-            Animation animation,
+        pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
           return MaterialApp(
             theme: ThemeData(
               colorScheme: redDarkColorScheme,
             ),
-            home: Scaffold(
-                appBar: AppBar(
-                    title: TextField(
-
-                    )
-                )),
-
-
+            home: Scaffold(appBar: AppBar(title: TextField())),
           );
         });
   }
 
-  showdialog(){
+  showdialog() {
     //dialog z info o API
     showGeneralDialog(
         context: context,
         barrierDismissible: true,
-        barrierLabel: MaterialLocalizations.of(context)
-            .modalBarrierDismissLabel,
+        barrierLabel:
+            MaterialLocalizations.of(context).modalBarrierDismissLabel,
         barrierColor: Colors.black,
         transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (BuildContext buildContext,
-            Animation animation,
+        pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
           return MaterialApp(
               theme: ThemeData(
@@ -199,45 +191,67 @@ class _MyHomePageState extends State<MyHomePage> {
                   appBar: AppBar(
                       bottom: const TabBar(
                         tabs: [
-                          Tab(text: "API",),
-                          Tab(text: "Rodzaje\nzanieczyszczeń",),
-                          Tab(text: "Indeks jakości\npowietrza",),
+                          Tab(
+                            text: "API",
+                          ),
+                          Tab(
+                            text: "Rodzaje\nzanieczyszczeń",
+                          ),
+                          Tab(
+                            text: "Indeks jakości\npowietrza",
+                          ),
                         ],
                       ),
-
-
-
-                      title: const Text('Informacje')
-                  ),
+                      title: const Text('Informacje')),
                   body: TabBarView(
                     children: [
-                      Text("\nAplikacja korzysta z interfejsu API portalu \"Jakość Powietrza\" GIOŚ umożliwia dostęp do"
-                          " danych dotyczących jakości powietrza w Polsce, wytwarzanych w ramach "
-                          "Państwowego Monitoringu Środowiska i gromadzonych w bazie JPOAT2,0."),
-                      RichText(
-                          text: TextSpan(text: "\n",
-                              children: const <TextSpan>[
-                                TextSpan(text: "Pył zawieszony PM10 i PM2,5\n",style: TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(text: "Pył zawieszony to bardzo drobne cząstki stałe, unoszące się w powietrzu. Ze względu na swoje niewielkie rozmiary,"
-                                    " pył drobny dostaje się bez problemu do dróg oddechowych, powodując zmniejszoną respirację i prowadząc do chorób układu oddechowego."
-                                    " Natomiast już pył PM1 (o średnicy poniżej 1 µm) może przedostawać się do krwioobiegu. To jeden z powodów, dla których pyły "
-                                    "są uznawane za bardzo niebezpieczne dla zdrowia. Dodatkowo, w skład pyłu zazwyczaj wchodzą metale ciężkie oraz wielopierścieniowe "
-                                    "węglowodory aromatyczne posiadające potwierdzone właściwości kancerogenne. Z danych EEA wynika, że w roku 2017 dzienne normy PM10,"
-                                    " ustalone przez UE, zostały przekroczone w 17 państwach członkowskich oraz w 6 innych państwach przekazujących dane. "
-                                    "W przypadku rocznej normy pyłów PM2,5 przekroczenie odnotowano w 7 państwach członkowskich oraz w 3 innych państwach przekazujących dane."
-                                    " Natomiast roczne zalecenia WHO dla PM10 zostały przekroczone na 51% stacji monitorujących, w prawie wszystkich państwach raportujących "
-                                    "(oprócz Estonii, Finlandii i Irlandii).   przypadku PM2,5 roczne przekroczenia zaleceń WHO odnotowano na 69% stacji monitorujących, "
-                                    "w prawie wszystkich państwach raportujących (oprócz Estonii, Finlandii i Norwegii).\n\n", ),
-                                TextSpan(text: "Pozostałe zanieczyszczenia\n",style: TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(text: "Do pozostałych szkodliwych dla człowieka zanieczyszczeń powietrza, omawianych przez EEA, należą: benzen, "
-                                    "dwutlenek siarki, tlenek węgla - czad, benzo(a)piren oraz metale ciężkie w pyle PM10 (arsen (As), kadm (Cd), nikiel (Ni),"
-                                    " ołów (Pb) i rtęć (Hg)). EEA informuje, że zanieczyszczenie powietrza szkodzi nie tylko bezpośrednio człowiekowi, "
-                                    "ale również florze i faunie. Wpływa negatywnie na stan jakości gleb i wód. Wśród najbardziej szkodliwych zanieczyszczeń powietrza "
-                                    "dla świata przyrody EEA wymienia ozon, amoniak i tlenki azotu. Dla prawie wszystkich wymienionych zanieczyszczeń obserwujemy spadek "
-                                    "ich emisji w latach 2000-2017. Wyjątek stanowi jedynie emisja amoniaku, która za sprawą rozwoju rolnictwa od 2013 roku zaczyna "
-                                    "stopniowo wzrastać, ale w dalszym ciągu jest niższa niż w roku 2000.")
-                              ])),
-                      SingleChildScrollView(child:Html(data:"""<br>
+                      Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Text(
+                            "\nAplikacja korzysta z interfejsu API portalu \"Jakość Powietrza\" GIOŚ umożliwia dostęp do"
+                            " danych dotyczących jakości powietrza w Polsce, wytwarzanych w ramach "
+                            "Państwowego Monitoringu Środowiska i gromadzonych w bazie JPOAT2,0."),
+                      ),
+                      Container(
+                          margin: EdgeInsets.all(15.0),
+                          child: new SingleChildScrollView(
+                              child: RichText(
+                                  text: TextSpan(
+                                      text: "\n",
+                                      children: const <TextSpan>[
+                                TextSpan(
+                                    text: "Pył zawieszony PM10 i PM2,5\n",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(
+                                  text:
+                                      "Pył zawieszony to bardzo drobne cząstki stałe, unoszące się w powietrzu. Ze względu na swoje niewielkie rozmiary,"
+                                      " pył drobny dostaje się bez problemu do dróg oddechowych, powodując zmniejszoną respirację i prowadząc do chorób układu oddechowego."
+                                      " Natomiast już pył PM1 (o średnicy poniżej 1 µm) może przedostawać się do krwioobiegu. To jeden z powodów, dla których pyły "
+                                      "są uznawane za bardzo niebezpieczne dla zdrowia. Dodatkowo, w skład pyłu zazwyczaj wchodzą metale ciężkie oraz wielopierścieniowe "
+                                      "węglowodory aromatyczne posiadające potwierdzone właściwości kancerogenne. Z danych EEA wynika, że w roku 2017 dzienne normy PM10,"
+                                      " ustalone przez UE, zostały przekroczone w 17 państwach członkowskich oraz w 6 innych państwach przekazujących dane. "
+                                      "W przypadku rocznej normy pyłów PM2,5 przekroczenie odnotowano w 7 państwach członkowskich oraz w 3 innych państwach przekazujących dane."
+                                      " Natomiast roczne zalecenia WHO dla PM10 zostały przekroczone na 51% stacji monitorujących, w prawie wszystkich państwach raportujących "
+                                      "(oprócz Estonii, Finlandii i Irlandii).   przypadku PM2,5 roczne przekroczenia zaleceń WHO odnotowano na 69% stacji monitorujących, "
+                                      "w prawie wszystkich państwach raportujących (oprócz Estonii, Finlandii i Norwegii).\n\n",
+                                ),
+                                TextSpan(
+                                    text: "Pozostałe zanieczyszczenia\n",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(
+                                    text:
+                                        "Do pozostałych szkodliwych dla człowieka zanieczyszczeń powietrza, omawianych przez EEA, należą: benzen, "
+                                        "dwutlenek siarki, tlenek węgla - czad, benzo(a)piren oraz metale ciężkie w pyle PM10 (arsen (As), kadm (Cd), nikiel (Ni),"
+                                        " ołów (Pb) i rtęć (Hg)). EEA informuje, że zanieczyszczenie powietrza szkodzi nie tylko bezpośrednio człowiekowi, "
+                                        "ale również florze i faunie. Wpływa negatywnie na stan jakości gleb i wód. Wśród najbardziej szkodliwych zanieczyszczeń powietrza "
+                                        "dla świata przyrody EEA wymienia ozon, amoniak i tlenki azotu. Dla prawie wszystkich wymienionych zanieczyszczeń obserwujemy spadek "
+                                        "ich emisji w latach 2000-2017. Wyjątek stanowi jedynie emisja amoniaku, która za sprawą rozwoju rolnictwa od 2013 roku zaczyna "
+                                        "stopniowo wzrastać, ale w dalszym ciągu jest niższa niż w roku 2000.")
+                              ])))),
+                      SingleChildScrollView(
+                        child: Html(data: """<br>
                 <table style="height: 600px; width: 400px; display: table; opacity: 1;" cellspacing="1" cellpadding="5" border="1" align="center">
 	<thead>
 		<tr>
@@ -272,24 +286,23 @@ class _MyHomePageState extends State<MyHomePage> {
 		</tr>
 	</tbody>
 </table>
-                """),)
+                """),
+                      )
                     ],
                   ),
                 ),
               ));
         });
-
   }
 
-
   BarChartGroupData makeGroupData(
-      int x,
-      double y, {
-        bool isTouched = false,
-        Color barColor = const Color(0xFFb71c1c),
-        double width = 22,
-        List<int> showTooltips = const [],
-      }) {
+    int x,
+    double y, {
+    bool isTouched = false,
+    Color barColor = const Color(0xFFb71c1c),
+    double width = 22,
+    List<int> showTooltips = const [],
+  }) {
     return BarChartGroupData(
       x: x,
       barRods: [
@@ -312,25 +325,25 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
-    switch (i) {
-      case 0:
-        return makeGroupData(0, 5, isTouched: i == touchedIndex);
-      case 1:
-        return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
-      case 2:
-        return makeGroupData(2, 5, isTouched: i == touchedIndex);
-      case 3:
-        return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
-      case 4:
-        return makeGroupData(4, 9, isTouched: i == touchedIndex);
-      case 5:
-        return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
-      case 6:
-        return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
-      default:
-        return throw Error();
-    }
-  });
+        switch (i) {
+          case 0:
+            return makeGroupData(0, 5, isTouched: i == touchedIndex);
+          case 1:
+            return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
+          case 2:
+            return makeGroupData(2, 5, isTouched: i == touchedIndex);
+          case 3:
+            return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
+          case 4:
+            return makeGroupData(4, 9, isTouched: i == touchedIndex);
+          case 5:
+            return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
+          case 6:
+            return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
+          default:
+            return throw Error();
+        }
+      });
 
   BarChartData mainBarData() {
     return BarChartData(
