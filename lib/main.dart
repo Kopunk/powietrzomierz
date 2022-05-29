@@ -183,7 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Animation secondaryAnimation) {
           return MaterialApp(
               theme: ThemeData(
-                colorScheme: redDarkColorScheme,
+                colorScheme: greenColorScheme,
               ),
               home: DefaultTabController(
                 length: 3,
@@ -218,6 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: RichText(
                                   text: TextSpan(
                                       text: "\n",
+                                      style: TextStyle(color: Theme.of(context).secondaryHeaderColor),
                                       children: const <TextSpan>[
                                 TextSpan(
                                     text: "Pył zawieszony PM10 i PM2,5\n",
