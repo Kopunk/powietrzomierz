@@ -218,6 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: RichText(
                                   text: TextSpan(
                                       text: "\n",
+                                      style: TextStyle(color: Theme.of(context).secondaryHeaderColor),
                                       children: const <TextSpan>[
                                 TextSpan(
                                     text: "Pył zawieszony PM10 i PM2,5\n",
