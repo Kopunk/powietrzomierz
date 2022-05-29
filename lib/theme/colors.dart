@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-Color primaryRed = const Color(0xFFb71c1c);
-Color primaryGreen = const Color(0xFF4bb5ab);
-Color secondary = const Color(0xFF4b4b4b);
+Color primaryRed = Color(0xFFb71c1c);
+Color primaryGreen = Color(0xFF4bb5ab);
+Color secondary = Color(0xFF4b4b4b);
 
 ColorScheme greenColorScheme = ColorScheme.fromSeed(
     brightness: Brightness.light, seedColor: primaryGreen, secondary: secondary);

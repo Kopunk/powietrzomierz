@@ -20,7 +20,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Powietrzomierz',
       theme: ThemeData(
-        colorScheme: redDarkColorScheme,
+        // colorScheme: greenColorScheme,
+        colorScheme: greenDarkColorScheme,
+        // colorScheme: redColorScheme,
+        // colorScheme: redDarkColorScheme,
       ),
       home: const MyHomePage(title: 'Powietrzomierz'),
     );
@@ -162,9 +165,7 @@ class _MyHomePageState extends State<MyHomePage> {
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
           return MaterialApp(
-            theme: ThemeData(
-              colorScheme: redDarkColorScheme,
-            ),
+            theme: Theme.of(buildContext),
             home: Scaffold(appBar: AppBar(title: TextField())),
           );
         });
@@ -182,9 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
           return MaterialApp(
-              theme: ThemeData(
-                colorScheme: redDarkColorScheme,
-              ),
+              theme: Theme.of(buildContext),
               home: DefaultTabController(
                 length: 3,
                 child: Scaffold(
