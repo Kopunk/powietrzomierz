@@ -28,6 +28,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   percent_indicator: ^4.0.1
+  flutter_html: ^2.2.1
   fl_chart: ^0.50.5
   flutter:
     sdk: flutter
