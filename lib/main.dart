@@ -11,6 +11,7 @@ import 'api_manager.dart';
 import 'air_quality_index_table.dart';
 import 'package:marquee/marquee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'search.dart';
 
 void main() {
   runApp(const MyApp());
@@ -53,14 +54,25 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Stations stations;
-  String _lastPlace = "";
+  int _lastStationId = 0;
+  String _lastStationName = "";
+  IndexLevel _stationIndex = IndexLevel(id: -1, indexLevelName: "¯\\_(ツ)_/¯");
   List<Station> _foundStations = [];
+  String _mainIndicatorStatus = "";
 
   @override
   void initState() {
     super.initState();
     Stations.fetchAllStations().then((value) {
       stations = value;
+    }).whenComplete(() {
+      _loadlastStation().whenComplete(() {
+        Station currentStation = stations.getStationById(_lastStationId);
+        _lastStationName = currentStation.name;
+        currentStation.getStationIndexLevel().then((value) {
+          _stationIndex = value;
+        });
+      });
     });
 
     _foundStations = [];
@@ -74,21 +86,21 @@ class _MyHomePageState extends State<MyHomePage> {
   bool isPlaying = false;
 
   //Loading last_place value on start
-  Future<void> _loadLastPlace() async {
+  Future<void> _loadlastStation() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _lastPlace =
-          (prefs.getString('last_place') ?? stations.getStationList()[0].name);
+      _lastStationId =
+          (prefs.getInt('last_place') ?? stations.getStationList()[0].id);
     });
   }
 
   //Saving last_place
-  Future<void> _saveLastPlace() async {
+  Future<void> _savelastStation() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _lastPlace =
-          (prefs.getString('last_place') ?? stations.getStationList()[0].name);
-      prefs.setString('last_place', _lastPlace);
+      _lastStationId =
+          (prefs.getInt('last_place') ?? stations.getStationList()[0].id);
+      prefs.setInt('last_place', _lastStationId);
     });
   }
 
@@ -124,13 +136,17 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(70))),
                   ),
                   label: Marquee(
-                      text: _lastPlace,
+                      text: _lastStationName == ""
+                          ? "Katowice"
+                          : _lastStationName,
                       pauseAfterRound: Duration(seconds: 2),
                       blankSpace: 30,
                       velocity: 20),
                   icon: const Icon(Icons.home),
                   onPressed: () {
-                    search();
+                    // Navigator.push(
+                    //   context,
+                    // );
                   },
                 )),
             Container(
@@ -138,12 +154,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: CircularPercentIndicator(
                   radius: 90.0,
                   lineWidth: 5.0,
-                  percent: 0.7,
+                  percent: _stationIndex.id != -1 ? _stationIndex.id * 20.0 : 0,
+                  linearGradient: LinearGradient(colors: [primaryGreen, primaryRed]),
                   center: Text(
-                    "Dobry",
+                    _stationIndex.indexLevelName,
                     style: TextStyle(fontSize: 30),
                   ),
-                  progressColor: primaryGreen,
+                  // progressColor: primaryGreen,
                 )),
             Expanded(
                 flex: 2,
@@ -179,40 +196,40 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  search() {
-    //dialog z info o API
-    showGeneralDialog(
-        context: context,
-        barrierDismissible: true,
-        barrierLabel:
-            MaterialLocalizations.of(context).modalBarrierDismissLabel,
-        barrierColor: Colors.black,
-        transitionDuration: const Duration(milliseconds: 200),
-        pageBuilder: (BuildContext buildContext, Animation animation,
-            Animation secondaryAnimation) {
-          return MaterialApp(
-            theme: Theme.of(context),
-            home: Scaffold(
-                appBar: AppBar(title: TextField(onChanged: (value) {
-                  stations.searchStations(value).then((value) {
-                    setState(() => _foundStations = value);
-                    print(_foundStations);
-                  });
-                })),
-                body: ListView.builder(
-                    key: UniqueKey(),
-                    itemCount: _foundStations.length,
-                    itemBuilder: (context, i) {
-                      // return Container(height: 20, child: Text("123"));
-                      return ListTile(
-                          title: Text("dupa"), //_foundStations[i].name),
-                          onTap: () {
-                            print(_foundStations);
-                          });
-                    })),
-          );
-        });
-  }
+  // search() async {
+  //   //dialog z info o API
+  //   showGeneralDialog(
+  //       context: context,
+  //       barrierDismissible: true,
+  //       barrierLabel:
+  //           MaterialLocalizations.of(context).modalBarrierDismissLabel,
+  //       barrierColor: Colors.black,
+  //       transitionDuration: const Duration(milliseconds: 200),
+  //       pageBuilder: (BuildContext buildContext, Animation animation,
+  //           Animation secondaryAnimation) {
+  //         return MaterialApp(
+  //           theme: Theme.of(context),
+  //           home: Scaffold(
+  //               appBar: AppBar(title: TextField(onChanged: (value) {
+  //                 stations.searchStations(value).then((value) {
+  //                   setState(() => _foundStations = value);
+  //                   print(_foundStations);
+  //                 });
+  //               })),
+  //               body: ListView.builder(
+  //                   key: UniqueKey(),
+  //                   itemCount: _foundStations.length,
+  //                   itemBuilder: (context, i) {
+  //                     // return Container(height: 20, child: Text("123"));
+  //                     return ListTile(
+  //                         title: Text("dupa"), //_foundStations[i].name),
+  //                         onTap: () {
+  //                           print(_foundStations);
+  //                         });
+  //                   })),
+  //         );
+  //       });
+  // }
 
   showdialog() {
     //dialog z info o API
@@ -533,4 +550,48 @@ class _MyHomePageState extends State<MyHomePage> {
   // _onSearchFieldChanged(String value) async {
   //     Future<List<Station>> stations = await stations.searchStations(value);
   // }
+}
+
+class Search extends StatefulWidget {
+  @override
+  SearchState createState() => new SearchState();
+}
+
+class SearchState extends State<Search> {
+  List<dynamic> _foundStations = [];
+  late Stations stations;
+  @override
+  void initState() {
+    super.initState();
+    Stations.fetchAllStations().then((value) {
+      stations = value;
+    });
+
+    _foundStations = [];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: Theme.of(context),
+      home: Scaffold(
+          appBar: AppBar(title: TextField(onChanged: (value) {
+            stations.searchStations(value).then((value) {
+              setState(() => _foundStations = value);
+              print(_foundStations);
+            });
+          })),
+          body: ListView.builder(
+              key: UniqueKey(),
+              itemCount: _foundStations.length,
+              itemBuilder: (context, i) {
+                // return Container(height: 20, child: Text("123"));
+                return ListTile(
+                    title: Text(_foundStations[i].name),
+                    onTap: () {
+                      print(_foundStations);
+                    });
+              })),
+    );
+  }
 }

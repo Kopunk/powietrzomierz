@@ -37,6 +37,10 @@ class Stations {
     return s.name.split(' ');
   }
 
+  Station getStationById(int id) {
+    return stations.where((e) => e.id == id).first;
+  }
+
   @override
   String toString() {
     return stations.toString();
@@ -65,6 +69,12 @@ class Station {
         name: json['stationName'],
         gegrLat: double.parse(json['gegrLat']),
         gegrLon: double.parse(json['gegrLon']));
+  }
+
+  Future<IndexLevel> getStationIndexLevel() async {
+    SensorData sensorData = await SensorData.fetchSensorData(id);
+    return sensorData.pollutionST ??
+        IndexLevel(id: -1, indexLevelName: "¯\\_(ツ)_/¯");
   }
 
   @override
