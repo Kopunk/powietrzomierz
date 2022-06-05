@@ -71,6 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
         _lastStationName = currentStation.name;
         currentStation.getStationIndexLevel().then((value) {
           _stationIndex = value;
+          print(_stationIndex.indexLevelName);
+          print(_stationIndex.id);
         });
       });
     });
@@ -144,9 +146,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       velocity: 20),
                   icon: const Icon(Icons.home),
                   onPressed: () {
-                    // Navigator.push(
-                    //   context,
-                    // );
+                    Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (BuildContext context) => Search(),
+                      ),
+                    );
                   },
                 )),
             Container(
@@ -154,12 +159,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: CircularPercentIndicator(
                   radius: 90.0,
                   lineWidth: 5.0,
-                  percent: _stationIndex.id != -1 ? _stationIndex.id * 20.0 : 0,
-                  linearGradient: LinearGradient(colors: [primaryGreen, primaryRed]),
+                  percent: _stationIndex.id != -1 ? 0.67 : 0,
+                  linearGradient:
+                      LinearGradient(colors: [primaryRed, primaryGreen]),
+                  rotateLinearGradient: true,
                   center: Text(
                     _stationIndex.indexLevelName,
-                    style: TextStyle(fontSize: 30),
+                    style: TextStyle(
+                      fontSize: 30,
+                    ),
                   ),
+                  addAutomaticKeepAlive: false,
                   // progressColor: primaryGreen,
                 )),
             Expanded(
@@ -568,6 +578,7 @@ class SearchState extends State<Search> {
     });
 
     _foundStations = [];
+    String _lastStationName = "";
   }
 
   @override
@@ -587,10 +598,7 @@ class SearchState extends State<Search> {
               itemBuilder: (context, i) {
                 // return Container(height: 20, child: Text("123"));
                 return ListTile(
-                    title: Text(_foundStations[i].name),
-                    onTap: () {
-                      print(_foundStations);
-                    });
+                    title: Text(_foundStations[i].name), onTap: () {});
               })),
     );
   }
