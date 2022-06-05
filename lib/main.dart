@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
@@ -27,24 +28,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  final List<Color> availableColors = const [
-    Colors.purpleAccent,
-    Colors.yellow,
-    Colors.lightBlue,
-    Colors.orange,
-    Colors.pink,
-    Colors.redAccent,
-  ];
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
 class _MyHomePageState extends State<MyHomePage> {
   late Stations stations;
+  List<dynamic> _foundStations = [];
+  List<dynamic> _stations = [];
+  TextEditingController controller = TextEditingController();
+
+  final Color barBackgroundColor = const Color(0xaac9c8c8);
+  final Duration animDuration = const Duration(milliseconds: 250);
+
+  int touchedIndex = -1;
+
+  bool isPlaying = false;
+
 
   @override
   void initState() {
@@ -53,19 +49,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Stations.fetchAllStations()
         .then((value) => stations = Stations(stations: value.stations))
         .whenComplete(() => {
-              // print('$stations'),
-              stations
-                  .searchStations("Gdańsk, ul. Leczkowa")
-                  .then((value) => print(value.toString()))
-            });
+      // print('$stations'),
+      stations
+          .searchStations("Gdańsk, ul. Leczkowa")
+          .then((value) => print(value.toString()))
+    });
   }
 
-  final Color barBackgroundColor = const Color(0xaac9c8c8);
-  final Duration animDuration = const Duration(milliseconds: 250);
-
-  int touchedIndex = -1;
-
-  bool isPlaying = false;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           IconButton(
               onPressed: () {
-                showdialog();
+                showdialog(context);
               },
               icon: Icon(Icons.help_outline))
         ],
@@ -101,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   label: const Text('Katowice'),
                   icon: const Icon(Icons.home),
                   onPressed: () {
-                    search();
+                    search(context);
                   },
                 )),
             Container(
@@ -130,7 +120,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           child: Padding(
                             padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            const EdgeInsets.symmetric(horizontal: 8.0),
                             child: BarChart(
                               isPlaying ? randomData() : mainBarData(),
                               swapAnimationDuration: animDuration,
@@ -150,33 +140,107 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  search() {
-    //dialog z info o API
+
+  search(BuildContext context) {
+    //wyszukiwanie
     showGeneralDialog(
         context: context,
         barrierDismissible: true,
         barrierLabel:
-            MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        MaterialLocalizations
+            .of(context)
+            .modalBarrierDismissLabel,
         barrierColor: Colors.black,
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
-          return MaterialApp(
-            theme: ThemeData(
-              colorScheme: redDarkColorScheme,
+          return new Scaffold(
+            appBar: new AppBar(
+              title: new Text('Home'),
+              elevation: 0.0,
             ),
-            home: Scaffold(appBar: AppBar(title: TextField())),
+            body: new Column(
+              children: <Widget>[
+                new Container(
+                  color: Theme
+                      .of(context)
+                      .primaryColor,
+                  child: new Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: new Card(
+                      child: new ListTile(
+                        leading: new Icon(Icons.search),
+                        title: new TextField(
+                          controller: controller,
+                          decoration: new InputDecoration(
+                              hintText: 'Wyszukaj stację', border: InputBorder.none),
+                          onChanged: onSearchTextChanged,
+                        ),
+                        trailing: new IconButton(
+                          icon: new Icon(Icons.cancel), onPressed: () {
+                          controller.clear();
+                          onSearchTextChanged('');
+                        },),
+                      ),
+                    ),
+                  ),
+                ),
+                new Expanded(
+                  child: _foundStations.length != 0 ||
+                      controller.text.isNotEmpty
+                      ? new ListView.builder(
+                    itemCount: _foundStations.length,
+                    itemBuilder: (context, i) {
+                      return new Card(
+                        child: new ListTile(
+                          title: new Text(_foundStations[i].name),
+                        ),
+                        margin: const EdgeInsets.all(0.0),
+                      );
+                    },
+                  )
+                      : new ListView.builder(
+                    itemCount: _stations.length,
+                    itemBuilder: (context, index) {
+                      return new Card(
+                        child: new ListTile(
+                          title: new Text(_stations[index].name),
+                        onTap: (){},),
+                        margin: const EdgeInsets.all(0.0),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           );
         });
   }
 
-  showdialog() {
+  onSearchTextChanged(String text) async {
+    _foundStations.clear();
+    if (text.isEmpty) {
+      setState(() {});
+      return;
+    }
+    print("asd" + '$_stations');
+    _stations.forEach((_station) {
+      if (_station.name.contains(text))
+        _foundStations.add(_station);
+    });
+
+    setState(() {});
+  }
+
+  showdialog(BuildContext context) {
     //dialog z info o API
     showGeneralDialog(
         context: context,
         barrierDismissible: true,
         barrierLabel:
-            MaterialLocalizations.of(context).modalBarrierDismissLabel,
+        MaterialLocalizations
+            .of(context)
+            .modalBarrierDismissLabel,
         barrierColor: Colors.black,
         transitionDuration: const Duration(milliseconds: 200),
         pageBuilder: (BuildContext buildContext, Animation animation,
@@ -209,8 +273,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         margin: EdgeInsets.all(15.0),
                         child: Text(
                             "\nAplikacja korzysta z interfejsu API portalu \"Jakość Powietrza\" GIOŚ umożliwia dostęp do"
-                            " danych dotyczących jakości powietrza w Polsce, wytwarzanych w ramach "
-                            "Państwowego Monitoringu Środowiska i gromadzonych w bazie JPOAT2,0."),
+                                " danych dotyczących jakości powietrza w Polsce, wytwarzanych w ramach "
+                                "Państwowego Monitoringu Środowiska i gromadzonych w bazie JPOAT2,0."),
                       ),
                       Container(
                           margin: EdgeInsets.all(15.0),
@@ -218,39 +282,43 @@ class _MyHomePageState extends State<MyHomePage> {
                               child: RichText(
                                   text: TextSpan(
                                       text: "\n",
-                                      style: TextStyle(color: Theme.of(context).secondaryHeaderColor),
+                                      style: TextStyle(color: Theme
+                                          .of(context)
+                                          .secondaryHeaderColor),
                                       children: const <TextSpan>[
-                                TextSpan(
-                                    text: "Pył zawieszony PM10 i PM2,5\n",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                  text:
-                                      "Pył zawieszony to bardzo drobne cząstki stałe, unoszące się w powietrzu. Ze względu na swoje niewielkie rozmiary,"
-                                      " pył drobny dostaje się bez problemu do dróg oddechowych, powodując zmniejszoną respirację i prowadząc do chorób układu oddechowego."
-                                      " Natomiast już pył PM1 (o średnicy poniżej 1 µm) może przedostawać się do krwioobiegu. To jeden z powodów, dla których pyły "
-                                      "są uznawane za bardzo niebezpieczne dla zdrowia. Dodatkowo, w skład pyłu zazwyczaj wchodzą metale ciężkie oraz wielopierścieniowe "
-                                      "węglowodory aromatyczne posiadające potwierdzone właściwości kancerogenne. Z danych EEA wynika, że w roku 2017 dzienne normy PM10,"
-                                      " ustalone przez UE, zostały przekroczone w 17 państwach członkowskich oraz w 6 innych państwach przekazujących dane. "
-                                      "W przypadku rocznej normy pyłów PM2,5 przekroczenie odnotowano w 7 państwach członkowskich oraz w 3 innych państwach przekazujących dane."
-                                      " Natomiast roczne zalecenia WHO dla PM10 zostały przekroczone na 51% stacji monitorujących, w prawie wszystkich państwach raportujących "
-                                      "(oprócz Estonii, Finlandii i Irlandii).   przypadku PM2,5 roczne przekroczenia zaleceń WHO odnotowano na 69% stacji monitorujących, "
-                                      "w prawie wszystkich państwach raportujących (oprócz Estonii, Finlandii i Norwegii).\n\n",
-                                ),
-                                TextSpan(
-                                    text: "Pozostałe zanieczyszczenia\n",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                    text:
-                                        "Do pozostałych szkodliwych dla człowieka zanieczyszczeń powietrza, omawianych przez EEA, należą: benzen, "
-                                        "dwutlenek siarki, tlenek węgla - czad, benzo(a)piren oraz metale ciężkie w pyle PM10 (arsen (As), kadm (Cd), nikiel (Ni),"
-                                        " ołów (Pb) i rtęć (Hg)). EEA informuje, że zanieczyszczenie powietrza szkodzi nie tylko bezpośrednio człowiekowi, "
-                                        "ale również florze i faunie. Wpływa negatywnie na stan jakości gleb i wód. Wśród najbardziej szkodliwych zanieczyszczeń powietrza "
-                                        "dla świata przyrody EEA wymienia ozon, amoniak i tlenki azotu. Dla prawie wszystkich wymienionych zanieczyszczeń obserwujemy spadek "
-                                        "ich emisji w latach 2000-2017. Wyjątek stanowi jedynie emisja amoniaku, która za sprawą rozwoju rolnictwa od 2013 roku zaczyna "
-                                        "stopniowo wzrastać, ale w dalszym ciągu jest niższa niż w roku 2000.")
-                              ])))),
+                                        TextSpan(
+                                            text: "Pył zawieszony PM10 i PM2,5\n",
+                                            style:
+                                            TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        TextSpan(
+                                          text:
+                                          "Pył zawieszony to bardzo drobne cząstki stałe, unoszące się w powietrzu. Ze względu na swoje niewielkie rozmiary,"
+                                              " pył drobny dostaje się bez problemu do dróg oddechowych, powodując zmniejszoną respirację i prowadząc do chorób układu oddechowego."
+                                              " Natomiast już pył PM1 (o średnicy poniżej 1 µm) może przedostawać się do krwioobiegu. To jeden z powodów, dla których pyły "
+                                              "są uznawane za bardzo niebezpieczne dla zdrowia. Dodatkowo, w skład pyłu zazwyczaj wchodzą metale ciężkie oraz wielopierścieniowe "
+                                              "węglowodory aromatyczne posiadające potwierdzone właściwości kancerogenne. Z danych EEA wynika, że w roku 2017 dzienne normy PM10,"
+                                              " ustalone przez UE, zostały przekroczone w 17 państwach członkowskich oraz w 6 innych państwach przekazujących dane. "
+                                              "W przypadku rocznej normy pyłów PM2,5 przekroczenie odnotowano w 7 państwach członkowskich oraz w 3 innych państwach przekazujących dane."
+                                              " Natomiast roczne zalecenia WHO dla PM10 zostały przekroczone na 51% stacji monitorujących, w prawie wszystkich państwach raportujących "
+                                              "(oprócz Estonii, Finlandii i Irlandii).   przypadku PM2,5 roczne przekroczenia zaleceń WHO odnotowano na 69% stacji monitorujących, "
+                                              "w prawie wszystkich państwach raportujących (oprócz Estonii, Finlandii i Norwegii).\n\n",
+                                        ),
+                                        TextSpan(
+                                            text: "Pozostałe zanieczyszczenia\n",
+                                            style:
+                                            TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        TextSpan(
+                                            text:
+                                            "Do pozostałych szkodliwych dla człowieka zanieczyszczeń powietrza, omawianych przez EEA, należą: benzen, "
+                                                "dwutlenek siarki, tlenek węgla - czad, benzo(a)piren oraz metale ciężkie w pyle PM10 (arsen (As), kadm (Cd), nikiel (Ni),"
+                                                " ołów (Pb) i rtęć (Hg)). EEA informuje, że zanieczyszczenie powietrza szkodzi nie tylko bezpośrednio człowiekowi, "
+                                                "ale również florze i faunie. Wpływa negatywnie na stan jakości gleb i wód. Wśród najbardziej szkodliwych zanieczyszczeń powietrza "
+                                                "dla świata przyrody EEA wymienia ozon, amoniak i tlenki azotu. Dla prawie wszystkich wymienionych zanieczyszczeń obserwujemy spadek "
+                                                "ich emisji w latach 2000-2017. Wyjątek stanowi jedynie emisja amoniaku, która za sprawą rozwoju rolnictwa od 2013 roku zaczyna "
+                                                "stopniowo wzrastać, ale w dalszym ciągu jest niższa niż w roku 2000.")
+                                      ])))),
                       SingleChildScrollView(
                         child: Html(data: """<br>
                 <table style="height: 600px; width: 400px; display: table; opacity: 1;" cellspacing="1" cellpadding="5" border="1" align="center">
@@ -296,14 +364,13 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
-  BarChartGroupData makeGroupData(
-    int x,
-    double y, {
-    bool isTouched = false,
-    Color barColor = const Color(0xFFb71c1c),
-    double width = 22,
-    List<int> showTooltips = const [],
-  }) {
+  BarChartGroupData makeGroupData(int x,
+      double y, {
+        bool isTouched = false,
+        Color barColor = const Color(0xFFb71c1c),
+        double width = 22,
+        List<int> showTooltips = const [],
+      }) {
     return BarChartGroupData(
       x: x,
       barRods: [
@@ -317,7 +384,7 @@ class _MyHomePageState extends State<MyHomePage> {
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
             toY: 20,
-            color: barBackgroundColor,
+            color: secondary,
           ),
         ),
       ],
@@ -325,7 +392,8 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
+  List<BarChartGroupData> showingGroups() =>
+      List.generate(7, (i) {
         switch (i) {
           case 0:
             return makeGroupData(0, 5, isTouched: i == touchedIndex);
@@ -520,3 +588,21 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 }
+
+
+class MyHomePage extends StatefulWidget {
+  final List<Color> availableColors = const [
+    Colors.purpleAccent,
+    Colors.yellow,
+    Colors.lightBlue,
+    Colors.orange,
+    Colors.pink,
+    Colors.redAccent,
+  ];
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
