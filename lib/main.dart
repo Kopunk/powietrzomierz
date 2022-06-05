@@ -11,7 +11,6 @@ import 'api_manager.dart';
 import 'air_quality_index_table.dart';
 import 'package:marquee/marquee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'search.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +30,7 @@ class MyApp extends StatelessWidget {
         // colorScheme: greenColorScheme,
         // colorScheme: greenDarkColorScheme,
       ),
-      home: MyHomePage(title: 'Powietrzomierz'),
+      home: MyHomePage(title: 'Powietrzomierz', lastStationName: ""),
     );
   }
 }
@@ -45,8 +44,10 @@ class MyHomePage extends StatefulWidget {
     Colors.pink,
     Colors.redAccent,
   ];
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title, required lastStationName})
+      : super(key: key);
   final String title;
+  final String lastStationName = "";
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -55,7 +56,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late Stations stations;
   int _lastStationId = 0;
-  String _lastStationName = "";
+  String lastStationName = "";
   IndexLevel _stationIndex = IndexLevel(id: -1, indexLevelName: "¯\\_(ツ)_/¯");
   List<Station> _foundStations = [];
   String _mainIndicatorStatus = "";
@@ -68,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }).whenComplete(() {
       _loadlastStation().whenComplete(() {
         Station currentStation = stations.getStationById(_lastStationId);
-        _lastStationName = currentStation.name;
+        lastStationName = currentStation.name;
         currentStation.getStationIndexLevel().then((value) {
           _stationIndex = value;
           print(_stationIndex.indexLevelName);
@@ -138,9 +139,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         borderRadius: BorderRadius.all(Radius.circular(70))),
                   ),
                   label: Marquee(
-                      text: _lastStationName == ""
-                          ? "Katowice"
-                          : _lastStationName,
+                      text:
+                          lastStationName == "" ? "Katowice" : lastStationName,
                       pauseAfterRound: Duration(seconds: 2),
                       blankSpace: 30,
                       velocity: 20),
@@ -159,10 +159,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: CircularPercentIndicator(
                   radius: 90.0,
                   lineWidth: 5.0,
-                  percent: _stationIndex.id != -1 ? 0.67 : 0,
-                  linearGradient:
-                      LinearGradient(colors: [primaryRed, primaryGreen]),
-                  rotateLinearGradient: true,
+                  percent: _stationIndex.id != -1
+                      ? (5 - _stationIndex.id) / 5.0
+                      : 0, //1 - _stationIndex.id / 50 +
+                  // linearGradient:
+                  //     LinearGradient(colors: [primaryRed, primaryGreen]),
+                  // rotateLinearGradient: true,
+                  backgroundColor: Color.fromARGB(0, 0, 0, 0),
                   center: Text(
                     _stationIndex.indexLevelName,
                     style: TextStyle(
@@ -170,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
                   addAutomaticKeepAlive: false,
-                  // progressColor: primaryGreen,
+                  progressColor: primaryGreen,
                 )),
             Expanded(
                 flex: 2,
@@ -578,7 +581,7 @@ class SearchState extends State<Search> {
     });
 
     _foundStations = [];
-    String _lastStationName = "";
+    String lastStationName = "";
   }
 
   @override
@@ -598,7 +601,19 @@ class SearchState extends State<Search> {
               itemBuilder: (context, i) {
                 // return Container(height: 20, child: Text("123"));
                 return ListTile(
-                    title: Text(_foundStations[i].name), onTap: () {});
+                    title: Text(_foundStations[i].name),
+                    onTap: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      setState(() {
+                        prefs.setInt('last_place', _foundStations[i].id);
+                      });
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MyHomePage(
+                                  title: "Powietrzomierz",
+                                  lastStationName: _foundStations[i].name)));
+                    });
               })),
     );
   }
