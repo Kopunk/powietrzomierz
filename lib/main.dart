@@ -7,6 +7,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'api_manager.dart';
 import 'air_quality_index_table.dart';
+import 'package:marquee/marquee.dart';
 
 void main() {
   runApp(const MyApp());
@@ -96,7 +97,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(70))),
                   ),
-                  label: const Text('Katowice'),
+                  label: Marquee(text: 'Katowiceeeeeeeeeeeeeeeeeee', pauseAfterRound: Duration(seconds: 2), blankSpace: 30, velocity: 20),
                   icon: const Icon(Icons.home),
                   onPressed: () {
                     search();

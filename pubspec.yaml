@@ -31,6 +31,8 @@ dependencies:
   flutter_html: ^2.2.1
   full_text_search: ^0.8.0+3
   fl_chart: ^0.50.5
+  marquee: ^2.2.3
+  shared_preferences: ^2.0.15
   flutter:
     sdk: flutter
 
