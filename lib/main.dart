@@ -8,6 +8,7 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'api_manager.dart';
 import 'air_quality_index_table.dart';
 import 'package:marquee/marquee.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -44,6 +45,8 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
 
+  List<dynamic> _foundStations = [];++
+
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
@@ -54,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
 
+    final prefs = await SharedPreferences.getInstance();
     Stations.fetchAllStations().then((value) {
       stations = value;
     });
@@ -163,8 +167,20 @@ class _MyHomePageState extends State<MyHomePage> {
           return MaterialApp(
             theme: Theme.of(context),
             home: Scaffold(appBar: AppBar(title: TextField(onChanged: (value) {
-              stations.searchStations(value).then((value) => print(value));
-            }))),
+              stations.searchStations(value).then((value) => _foundStations = value);
+            }))
+            body: new Expanded(child: _foundStations.lenght !=0
+            ? new ListView.builder(
+              itemCount: _foundStations.length,
+              itemBuilder: (context, i) {
+                return new Card(
+                  child: new ListTile(
+                    title: new Text(_foundStations[i].name),
+                  onTap: (){print(_foundStations[i].name)}),
+                  margin: const EdgeInsets.all(0.0),
+                );
+              }
+            ))),
           );
         });
   }
