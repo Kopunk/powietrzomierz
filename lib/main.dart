@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -28,7 +30,7 @@ class MyApp extends StatelessWidget {
         // colorScheme: greenColorScheme,
         // colorScheme: greenDarkColorScheme,
       ),
-      home: const MyHomePage(title: 'Powietrzomierz'),
+      home: MyHomePage(title: 'Powietrzomierz'),
     );
   }
 }
@@ -42,10 +44,8 @@ class MyHomePage extends StatefulWidget {
     Colors.pink,
     Colors.redAccent,
   ];
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
   final String title;
-
-  List<dynamic> _foundStations = [];++
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -53,14 +53,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Stations stations;
+  String _lastPlace = "";
+  List<Station> _foundStations = [];
+
   @override
   void initState() {
     super.initState();
-
-    final prefs = await SharedPreferences.getInstance();
     Stations.fetchAllStations().then((value) {
       stations = value;
     });
+
+    _foundStations = [];
   }
 
   final Color barBackgroundColor = const Color(0xaac9c8c8);
@@ -69,6 +72,25 @@ class _MyHomePageState extends State<MyHomePage> {
   int touchedIndex = -1;
 
   bool isPlaying = false;
+
+  //Loading last_place value on start
+  Future<void> _loadLastPlace() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _lastPlace =
+          (prefs.getString('last_place') ?? stations.getStationList()[0].name);
+    });
+  }
+
+  //Saving last_place
+  Future<void> _saveLastPlace() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _lastPlace =
+          (prefs.getString('last_place') ?? stations.getStationList()[0].name);
+      prefs.setString('last_place', _lastPlace);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +123,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(70))),
                   ),
-                  label: Marquee(text: 'Katowiceeeeeeeeeeeeeeeeeee', pauseAfterRound: Duration(seconds: 2), blankSpace: 30, velocity: 20),
+                  label: Marquee(
+                      text: _lastPlace,
+                      pauseAfterRound: Duration(seconds: 2),
+                      blankSpace: 30,
+                      velocity: 20),
                   icon: const Icon(Icons.home),
                   onPressed: () {
                     search();
@@ -166,21 +192,24 @@ class _MyHomePageState extends State<MyHomePage> {
             Animation secondaryAnimation) {
           return MaterialApp(
             theme: Theme.of(context),
-            home: Scaffold(appBar: AppBar(title: TextField(onChanged: (value) {
-              stations.searchStations(value).then((value) => _foundStations = value);
-            }))
-            body: new Expanded(child: _foundStations.lenght !=0
-            ? new ListView.builder(
-              itemCount: _foundStations.length,
-              itemBuilder: (context, i) {
-                return new Card(
-                  child: new ListTile(
-                    title: new Text(_foundStations[i].name),
-                  onTap: (){print(_foundStations[i].name)}),
-                  margin: const EdgeInsets.all(0.0),
-                );
-              }
-            ))),
+            home: Scaffold(
+                appBar: AppBar(title: TextField(onChanged: (value) {
+                  stations.searchStations(value).then((value) {
+                    setState(() => _foundStations = value);
+                    print(_foundStations);
+                  });
+                })),
+                body: ListView.builder(
+                    key: UniqueKey(),
+                    itemCount: _foundStations.length,
+                    itemBuilder: (context, i) {
+                      // return Container(height: 20, child: Text("123"));
+                      return ListTile(
+                          title: Text("dupa"), //_foundStations[i].name),
+                          onTap: () {
+                            print(_foundStations);
+                          });
+                    })),
           );
         });
   }

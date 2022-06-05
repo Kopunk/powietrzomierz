@@ -41,6 +41,10 @@ class Stations {
   String toString() {
     return stations.toString();
   }
+
+  List<Station> getStationList() {
+    return stations;
+  }
 }
 
 class Station {
