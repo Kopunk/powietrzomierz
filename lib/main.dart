@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:powietrzomierz/theme/colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:percent_indicator/percent_indicator.dart';
@@ -20,7 +19,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Powietrzomierz',
       theme: ThemeData(
+        // colorScheme: redColorScheme,
         colorScheme: redDarkColorScheme,
+        // colorScheme: greenColorScheme,
+        // colorScheme: greenDarkColorScheme,
       ),
       home: const MyHomePage(title: 'Powietrzomierz'),
     );
@@ -162,9 +164,7 @@ class _MyHomePageState extends State<MyHomePage> {
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
           return MaterialApp(
-            theme: ThemeData(
-              colorScheme: redDarkColorScheme,
-            ),
+            theme: Theme.of(context),
             home: Scaffold(appBar: AppBar(title: TextField())),
           );
         });
@@ -182,9 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
         pageBuilder: (BuildContext buildContext, Animation animation,
             Animation secondaryAnimation) {
           return MaterialApp(
-              theme: ThemeData(
-                colorScheme: redDarkColorScheme,
-              ),
+              theme: Theme.of(context),
               home: DefaultTabController(
                 length: 3,
                 child: Scaffold(
