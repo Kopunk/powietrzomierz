@@ -16,6 +16,19 @@ void main() {
   runApp(const MyApp());
 }
 
+class ThemeNotifier with ChangeNotifier {
+  ThemeData _themeData;
+
+  ThemeNotifier(this._themeData);
+
+  getTheme() => _themeData;
+
+  setTheme(ThemeData themeData) async {
+    _themeData = themeData;
+    notifyListeners();
+  }
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -36,14 +49,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  final List<Color> availableColors = const [
-    Colors.purpleAccent,
-    Colors.yellow,
-    Colors.lightBlue,
-    Colors.orange,
-    Colors.pink,
-    Colors.redAccent,
-  ];
   MyHomePage({Key? key, required this.title, required lastStationName})
       : super(key: key);
   final String title;
@@ -54,9 +59,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  ThemeData theme = ThemeData(colorScheme: redDarkColorScheme);
+  bool brightTheme = false;
   late Stations stations;
   int _lastStationId = 0;
   String lastStationName = "";
+  SensorData _stationSensorData = SensorData();
   IndexLevel _stationIndex = IndexLevel(id: -1, indexLevelName: "¯\\_(ツ)_/¯");
   List<Station> _foundStations = [];
   String _mainIndicatorStatus = "";
@@ -75,6 +83,9 @@ class _MyHomePageState extends State<MyHomePage> {
           print(_stationIndex.indexLevelName);
           print(_stationIndex.id);
         });
+        currentStation.getStationSensorData().then(((value) {
+          _stationSensorData = value;
+        }));
       });
     });
 
@@ -209,41 +220,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // search() async {
-  //   //dialog z info o API
-  //   showGeneralDialog(
-  //       context: context,
-  //       barrierDismissible: true,
-  //       barrierLabel:
-  //           MaterialLocalizations.of(context).modalBarrierDismissLabel,
-  //       barrierColor: Colors.black,
-  //       transitionDuration: const Duration(milliseconds: 200),
-  //       pageBuilder: (BuildContext buildContext, Animation animation,
-  //           Animation secondaryAnimation) {
-  //         return MaterialApp(
-  //           theme: Theme.of(context),
-  //           home: Scaffold(
-  //               appBar: AppBar(title: TextField(onChanged: (value) {
-  //                 stations.searchStations(value).then((value) {
-  //                   setState(() => _foundStations = value);
-  //                   print(_foundStations);
-  //                 });
-  //               })),
-  //               body: ListView.builder(
-  //                   key: UniqueKey(),
-  //                   itemCount: _foundStations.length,
-  //                   itemBuilder: (context, i) {
-  //                     // return Container(height: 20, child: Text("123"));
-  //                     return ListTile(
-  //                         title: Text("dupa"), //_foundStations[i].name),
-  //                         onTap: () {
-  //                           print(_foundStations);
-  //                         });
-  //                   })),
-  //         );
-  //       });
-  // }
-
   showdialog() {
     //dialog z info o API
     showGeneralDialog(
@@ -281,51 +257,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         margin: EdgeInsets.all(15.0),
                         // ignore: prefer_const_constructors
                         child: Text(
-                            "\nAplikacja korzysta z interfejsu API portalu \"Jakość Powietrza\" GIOŚ umożliwia dostęp do"
-                            " danych dotyczących jakości powietrza w Polsce, wytwarzanych w ramach "
-                            "Państwowego Monitoringu Środowiska i gromadzonych w bazie JPOAT2,0."),
+                          "\nAplikacja korzysta z interfejsu API portalu \"Jakość Powietrza\" GIOŚ umożliwia dostęp do"
+                          " danych dotyczących jakości powietrza w Polsce, wytwarzanych w ramach "
+                          "Państwowego Monitoringu Środowiska i gromadzonych w bazie JPOAT2,0.",
+                        ),
                       ),
-                      Container(
-                          margin: EdgeInsets.all(15.0),
-                          child: SingleChildScrollView(
-                              child: RichText(
-                                  text: TextSpan(
-                                      text: "\n",
-                                      style: TextStyle(
-                                          color: Theme.of(context)
-                                              .secondaryHeaderColor),
-                                      children: const <TextSpan>[
-                                TextSpan(
-                                    text: "Pył zawieszony PM10 i PM2,5\n",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                  text:
-                                      "Pył zawieszony to bardzo drobne cząstki stałe, unoszące się w powietrzu. Ze względu na swoje niewielkie rozmiary,"
-                                      " pył drobny dostaje się bez problemu do dróg oddechowych, powodując zmniejszoną respirację i prowadząc do chorób układu oddechowego."
-                                      " Natomiast już pył PM1 (o średnicy poniżej 1 µm) może przedostawać się do krwioobiegu. To jeden z powodów, dla których pyły "
-                                      "są uznawane za bardzo niebezpieczne dla zdrowia. Dodatkowo, w skład pyłu zazwyczaj wchodzą metale ciężkie oraz wielopierścieniowe "
-                                      "węglowodory aromatyczne posiadające potwierdzone właściwości kancerogenne. Z danych EEA wynika, że w roku 2017 dzienne normy PM10,"
-                                      " ustalone przez UE, zostały przekroczone w 17 państwach członkowskich oraz w 6 innych państwach przekazujących dane. "
-                                      "W przypadku rocznej normy pyłów PM2,5 przekroczenie odnotowano w 7 państwach członkowskich oraz w 3 innych państwach przekazujących dane."
-                                      " Natomiast roczne zalecenia WHO dla PM10 zostały przekroczone na 51% stacji monitorujących, w prawie wszystkich państwach raportujących "
-                                      "(oprócz Estonii, Finlandii i Irlandii).   przypadku PM2,5 roczne przekroczenia zaleceń WHO odnotowano na 69% stacji monitorujących, "
-                                      "w prawie wszystkich państwach raportujących (oprócz Estonii, Finlandii i Norwegii).\n\n",
-                                ),
-                                TextSpan(
-                                    text: "Pozostałe zanieczyszczenia\n",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
-                                TextSpan(
-                                    text:
-                                        "Do pozostałych szkodliwych dla człowieka zanieczyszczeń powietrza, omawianych przez EEA, należą: benzen, "
-                                        "dwutlenek siarki, tlenek węgla - czad, benzo(a)piren oraz metale ciężkie w pyle PM10 (arsen (As), kadm (Cd), nikiel (Ni),"
-                                        " ołów (Pb) i rtęć (Hg)). EEA informuje, że zanieczyszczenie powietrza szkodzi nie tylko bezpośrednio człowiekowi, "
-                                        "ale również florze i faunie. Wpływa negatywnie na stan jakości gleb i wód. Wśród najbardziej szkodliwych zanieczyszczeń powietrza "
-                                        "dla świata przyrody EEA wymienia ozon, amoniak i tlenki azotu. Dla prawie wszystkich wymienionych zanieczyszczeń obserwujemy spadek "
-                                        "ich emisji w latach 2000-2017. Wyjątek stanowi jedynie emisja amoniaku, która za sprawą rozwoju rolnictwa od 2013 roku zaczyna "
-                                        "stopniowo wzrastać, ale w dalszym ciągu jest niższa niż w roku 2000.")
-                              ])))),
+                      SingleChildScrollView(child: Html(data: pollution_str)),
                       SingleChildScrollView(
                         child: Html(data: air_quality_index_table_str),
                       )
@@ -365,22 +302,61 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  double pollutionlevel(IndexLevel? level) {
+    switch (level?.id) {
+      case 0:
+        return 1;
+        break; // The switch statement must be told to exit, or it will execute every case.
+      case 1:
+        return 2;
+        break;
+      case 2:
+        return 4;
+        break;
+      case 3:
+        return 6;
+        break; // The switch statement must be told to exit, or it will execute every case.
+      case 4:
+        return 8;
+        break;
+      case 5:
+        return 10;
+        break;
+      default:
+        return 0;
+    }
+  }
+
   List<BarChartGroupData> showingGroups() => List.generate(7, (i) {
         switch (i) {
           case 0:
-            return makeGroupData(0, 5, isTouched: i == touchedIndex);
+            return makeGroupData(
+                0, pollutionlevel(_stationSensorData.pollutionPM10),
+                isTouched: i == touchedIndex);
           case 1:
-            return makeGroupData(1, 6.5, isTouched: i == touchedIndex);
+            return makeGroupData(
+                1, pollutionlevel(_stationSensorData.pollutionPM25),
+                isTouched: i == touchedIndex);
           case 2:
-            return makeGroupData(2, 5, isTouched: i == touchedIndex);
+            return makeGroupData(
+                2, pollutionlevel(_stationSensorData.pollutionSO2),
+                isTouched: i == touchedIndex);
           case 3:
-            return makeGroupData(3, 7.5, isTouched: i == touchedIndex);
+            return makeGroupData(
+                3, pollutionlevel(_stationSensorData.pollutionNO2),
+                isTouched: i == touchedIndex);
           case 4:
-            return makeGroupData(4, 9, isTouched: i == touchedIndex);
+            return makeGroupData(
+                4, pollutionlevel(_stationSensorData.pollutionCO),
+                isTouched: i == touchedIndex);
           case 5:
-            return makeGroupData(5, 11.5, isTouched: i == touchedIndex);
+            return makeGroupData(
+                5, pollutionlevel(_stationSensorData.pollutionC6H6),
+                isTouched: i == touchedIndex);
           case 6:
-            return makeGroupData(6, 6.5, isTouched: i == touchedIndex);
+            return makeGroupData(
+                6, pollutionlevel(_stationSensorData.pollutionO3),
+                isTouched: i == touchedIndex);
           default:
             return throw Error();
         }
@@ -480,7 +456,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget getTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Colors.black,
+      // color: Colors.black,
       fontWeight: FontWeight.bold,
       fontSize: 12,
     );

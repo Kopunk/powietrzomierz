@@ -77,6 +77,11 @@ class Station {
         IndexLevel(id: -1, indexLevelName: "¯\\_(ツ)_/¯");
   }
 
+  Future<SensorData> getStationSensorData() async {
+    SensorData sensorData = await SensorData.fetchSensorData(id);
+    return sensorData;
+  }
+
   @override
   String toString() {
     return name;

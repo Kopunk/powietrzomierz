@@ -34,3 +34,23 @@ const String air_quality_index_table_str = """<br>
 	</tbody>
 </table>
 """;
+const String pollution_str = """
+                               <h3>Pył zawieszony PM10 i PM2,5</h3></br>                                  
+ <p>Pył zawieszony to bardzo drobne cząstki stałe, unoszące się w powietrzu. Ze względu na swoje niewielkie rozmiary,
+ pył drobny dostaje się bez problemu do dróg oddechowych, powodując zmniejszoną respirację i prowadząc do chorób układu oddechowego.
+  Natomiast już pył PM1 (o średnicy poniżej 1 µm) może przedostawać się do krwioobiegu. To jeden z powodów, dla których pyły 
+są uznawane za bardzo niebezpieczne dla zdrowia. Dodatkowo, w skład pyłu zazwyczaj wchodzą metale ciężkie oraz wielopierścieniowe 
+węglowodory aromatyczne posiadające potwierdzone właściwości kancerogenne. Z danych EEA wynika, że w roku 2017 dzienne normy PM10,
+ustalone przez UE, zostały przekroczone w 17 państwach członkowskich oraz w 6 innych państwach przekazujących dane. 
+W przypadku rocznej normy pyłów PM2,5 przekroczenie odnotowano w 7 państwach członkowskich oraz w 3 innych państwach przekazujących dane.
+Natomiast roczne zalecenia WHO dla PM10 zostały przekroczone na 51% stacji monitorujących, w prawie wszystkich państwach raportujących 
+(oprócz Estonii, Finlandii i Irlandii).   przypadku PM2,5 roczne przekroczenia zaleceń WHO odnotowano na 69% stacji monitorujących, 
+w prawie wszystkich państwach raportujących (oprócz Estonii, Finlandii i Norwegii).</p></br></br>
+<h3>Pozostałe zanieczyszczenia</h3></br>
+Do pozostałych szkodliwych dla człowieka zanieczyszczeń powietrza, omawianych przez EEA, należą: benzen, 
+dwutlenek siarki, tlenek węgla - czad, benzo(a)piren oraz metale ciężkie w pyle PM10 (arsen (As), kadm (Cd), nikiel (Ni),
+ołów (Pb) i rtęć (Hg)). EEA informuje, że zanieczyszczenie powietrza szkodzi nie tylko bezpośrednio człowiekowi, 
+ale również florze i faunie. Wpływa negatywnie na stan jakości gleb i wód. Wśród najbardziej szkodliwych zanieczyszczeń powietrza 
+dla świata przyrody EEA wymienia ozon, amoniak i tlenki azotu. Dla prawie wszystkich wymienionych zanieczyszczeń obserwujemy spadek
+ich emisji w latach 2000-2017. Wyjątek stanowi jedynie emisja amoniaku, która za sprawą rozwoju rolnictwa od 2013 roku zaczyna
+stopniowo wzrastać, ale w dalszym ciągu jest niższa niż w roku 2000.</p>""";

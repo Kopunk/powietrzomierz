@@ -33,6 +33,7 @@ dependencies:
   fl_chart: ^0.50.5
   marquee: ^2.2.3
   shared_preferences: ^2.0.15
+  provider: ^6.0.3
   flutter:
     sdk: flutter
 
