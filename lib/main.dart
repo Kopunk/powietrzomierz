@@ -285,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage> {
               : const BorderSide(color: Colors.white, width: 0),
           backDrawRodData: BackgroundBarChartRodData(
             show: true,
-            toY: 20,
+            toY: 21,
             color: barBackgroundColor,
           ),
         ),
@@ -300,19 +300,19 @@ class _MyHomePageState extends State<MyHomePage> {
         return 1;
         break; // The switch statement must be told to exit, or it will execute every case.
       case 1:
-        return 2;
-        break;
-      case 2:
         return 4;
         break;
+      case 2:
+        return 9;
+        break;
       case 3:
-        return 6;
+        return 13;
         break; // The switch statement must be told to exit, or it will execute every case.
       case 4:
-        return 8;
+        return 17;
         break;
       case 5:
-        return 10;
+        return 21;
         break;
       default:
         return 0;
