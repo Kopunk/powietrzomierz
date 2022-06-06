@@ -4,6 +4,9 @@ Color primaryRed = Color(0xFFb71c1c);
 Color primaryGreen = Color(0xFF4bb5ab);
 Color secondary = Color(0xFF4b4b4b);
 
+Color buttonRed = Color(0xFFf05545);
+Color buttonGreen = Color(0xFF80e8dd);
+
 ColorScheme greenColorScheme = ColorScheme.fromSeed(
     brightness: Brightness.light,
     seedColor: primaryGreen,

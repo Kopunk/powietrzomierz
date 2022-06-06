@@ -16,19 +16,6 @@ void main() {
   runApp(const MyApp());
 }
 
-class ThemeNotifier with ChangeNotifier {
-  ThemeData _themeData;
-
-  ThemeNotifier(this._themeData);
-
-  getTheme() => _themeData;
-
-  setTheme(ThemeData themeData) async {
-    _themeData = themeData;
-    notifyListeners();
-  }
-}
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -68,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   IndexLevel _stationIndex = IndexLevel(id: -1, indexLevelName: "¯\\_(ツ)_/¯");
   List<Station> _foundStations = [];
   String _mainIndicatorStatus = "";
+  Color _buttonColor = primaryRed;
 
   @override
   void initState() {
@@ -80,8 +68,11 @@ class _MyHomePageState extends State<MyHomePage> {
         lastStationName = currentStation.name;
         currentStation.getStationIndexLevel().then((value) {
           _stationIndex = value;
-          print(_stationIndex.indexLevelName);
-          print(_stationIndex.id);
+          if (_stationIndex.id < 1) {
+            _buttonColor = buttonGreen;
+          } else {
+            _buttonColor = buttonRed;
+          }
         });
         currentStation.getStationSensorData().then(((value) {
           _stationSensorData = value;
@@ -145,13 +136,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 margin: const EdgeInsets.only(top: 20.0, bottom: 20.0),
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
+                    // onSurface: _buttonColor,
                     fixedSize: const Size(240, 60),
                     shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(70))),
                   ),
                   label: Marquee(
-                      text:
-                          lastStationName == "" ? "Katowice" : lastStationName,
+                      text: lastStationName == "" ? "Ładowanie" : lastStationName,
                       pauseAfterRound: Duration(seconds: 2),
                       blankSpace: 30,
                       velocity: 20),
@@ -180,11 +171,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   center: Text(
                     _stationIndex.indexLevelName,
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 25,
                     ),
                   ),
                   addAutomaticKeepAlive: false,
                   progressColor: primaryGreen,
+
                 )),
             Expanded(
                 flex: 2,
